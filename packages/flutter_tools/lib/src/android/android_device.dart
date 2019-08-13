@@ -188,7 +188,12 @@ class AndroidDevice extends Device {
   Future<TargetPlatform> get targetPlatform async {
     if (_platform == null) {
       // http://developer.android.com/ndk/guides/abis.html (x86, armeabi-v7a, ...)
-      switch (await _getProperty('ro.product.cpu.abi')) {
+      String platform = await _getProperty('ro.product.cpu.abi');
+      final String cpuAbiList32 = await _getProperty('ro.product.cpu.abilist32');
+      if (cpuAbiList32 != null && cpuAbiList32.contains('v7') && platform.contains('v8')) {
+        platform = 'armeabi-v7a';
+      }
+      switch (platform) {
         case 'arm64-v8a':
           _platform = TargetPlatform.android_arm64;
           break;
